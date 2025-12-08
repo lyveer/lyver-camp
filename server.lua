@@ -8,24 +8,21 @@ local VORPCore = nil
 -- =============================================================================
 
 CreateThread(function()
-    Wait(1000) -- Framework'lerin tamamen yüklenmesi için güvenli bekleme
+    Wait(1000) 
 
     if Config.framework == 'RSG' then
         RSGCore = exports['rsg-core']:GetCoreObject()
         print('^2[lyver_camp] RSG Core yuklendi.^0')
         RegisterUsableItems() -- RSG Itemlerini Kaydet
     elseif Config.framework == 'VORP' then
-        -- VORP Inventory
         if exports.vorp_inventory then
             VORPInv = exports.vorp_inventory:vorp_inventoryApi()
         end
 
-        -- VORP Core (Event Yöntemi - En Güvenlisi)
         TriggerEvent("getCore", function(core)
             VORPCore = core
         end)
 
-        -- Eğer Event çalışmazsa (Eski sürüm fallback)
         if not VORPCore and exports.vorp_core then
             pcall(function()
                 VORPCore = exports.vorp_core:GetCore()
@@ -34,7 +31,7 @@ CreateThread(function()
 
         if VORPCore then
             print('^2[lyver_camp] VORP Core basariyla yuklendi.^0')
-            RegisterUsableItems() -- VORP Itemlerini Kaydet
+            RegisterUsableItems() 
         else
             print('^1[lyver_camp] HATA: VORP Core bulunamadi!^0')
         end
@@ -60,14 +57,12 @@ local function GetIdentifier(src)
     elseif Config.framework == 'VORP' then
         if VORPCore then
             local user = VORPCore.getUser(_src)
-            -- VORP bazen GetUser bazen getUser kullanır, kontrol ediyoruz:
             if not user and VORPCore.GetUser then user = VORPCore.GetUser(_src) end
 
             if user then return user.getIdentifier() end
         end
     end
 
-    -- Fallback (Standalone)
     local identifiers = GetPlayerIdentifiers(src)
     for _, id in ipairs(identifiers) do
         if string.find(id, "steam:") or string.find(id, "license:") then
@@ -80,7 +75,6 @@ end
 local function PlayerHasItem(src, item, amount)
     local _src = tonumber(src)
 
-    -- Güvenlik önlemi: Eğer item ismi boş gelirse direkt reddet (Çökme engeller)
     if not item or item == "" then
         print('^3[lyver_camp] UYARI: Item ismi bos oldugu icin kontrol yapilamadi.^0')
         return false
@@ -149,7 +143,6 @@ end
 
 local function CanPlayerPlaceCamp(identifier, campType)
     local count = 0
-    -- Configden o kamp türünün limitini alalım
     local limit = Config[campType .. 'Camp'].MaxPerPlayer or 1
 
     for _, camp in pairs(Camps) do
@@ -217,7 +210,6 @@ local function DeleteCampFromDatabase(campId)
     exports.oxmysql:update('DELETE FROM lyver_camps WHERE id = ?', { campId })
 end
 
--- KOMUT İLE SİLME (RCAMP)
 RegisterCommand('rcamp', function(source, args)
     local src = source
     local iden = GetIdentifier(src)
@@ -242,27 +234,21 @@ RegisterCommand('rcamp', function(source, args)
     Notify(src, "Kamp toplandi ve esya geri verildi.")
 end)
 
--- KAMP KURMA EVENTİ
--- server.lua içindeki placeCamp eventini bununla değiştir:
-
 RegisterNetEvent('lyver_camp:server:placeCamp', function(coords, heading, campType)
     local src = source
     local iden = GetIdentifier(src)
 
-    -- 1. campType Kontrolü (Gelen veri boşsa varsayılan olarak 'Small' yap)
     if not campType then
         campType = 'Small'
         print('^3[UYARI] Client campType gondermedi, varsayilan (Small) kullaniliyor.^0')
     end
 
-    -- 2. Config Kontrolü
     local configData = Config[campType .. 'Camp']
     if not configData then
         print('^1[HATA] Config dosyasinda boyle bir kamp turu yok: ' .. tostring(campType) .. 'Camp^0')
         return
     end
 
-    -- 3. Item İsmi Kontrolü (Hatanın asıl sebebi burası olabilir)
     local requiredItem = configData.ItemName
     if not requiredItem then
         print('^1[HATA] Config.' .. campType .. 'Camp icinde "ItemName" tanimli degil!^0')
@@ -270,11 +256,8 @@ RegisterNetEvent('lyver_camp:server:placeCamp', function(coords, heading, campTy
         return
     end
 
-    -- Temel kontroller
     if not iden or not coords then return end
 
-    -- 4. Envanter Kontrolü (Artık requiredItem kesinlikle nil değil)
-    -- Hata burada oluşuyordu çünkü requiredItem nil gidiyordu.
     if not PlayerHasItem(src, requiredItem, 1) then
         Notify(src, 'Uzerinde gerekli esya yok: ' .. requiredItem)
         return
@@ -309,7 +292,7 @@ AddEventHandler('onResourceStart', function(resName)
                 owner   = row.owner,
                 coords  = { x = row.x, y = row.y, z = row.z },
                 heading = row.heading or 0.0,
-                type    = row.type or 'Small' -- Varsayılan Small
+                type    = row.type or 'Small'
             }
         end
         print('^2[lyver_camp] Yuklenen kamp sayisi: ' .. tostring(#rows or 0) .. '^0')

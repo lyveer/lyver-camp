@@ -1,6 +1,6 @@
 Config = {}
 
-Config.framework = 'RSG' -- RSG
+Config.framework = 'RSG' 
 
 Config.SmallCamp = {
     ItemName      = 'small_camp_kit',    
