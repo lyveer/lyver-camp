@@ -1,0 +1,3 @@
+    small_camp_kit = { name = 'small_camp_kit', label = 'Small Camp Kit', weight = 5, type = 'item', image = 'small_camp_kit.png', unique = true, useable = true, shouldClose = true, description = 'Portable camp kit.' },
+    med_camp_kit = { name = 'med_camp_kit', label = 'Medium Camp Kit', weight = 8, type = 'item', image = 'med_camp_kit.png', unique = true, useable = true, shouldClose = true, description = 'Portable camp kit.' },
+    pro_camp_kit = { name = 'pro_camp_kit', label = 'Professional Camp Kit', weight = 10, type = 'item', image = 'pro_camp_kit.png', unique = true, useable = true, shouldClose = true, description = 'Portable scamp kit.' },
